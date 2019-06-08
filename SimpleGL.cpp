@@ -20,8 +20,12 @@
 #include "glm/ext/matrix_clip_space.hpp" // glm::perspective
 #include "glm/ext/scalar_constants.hpp" // glm::pi
 
+#include "Huis.h"
+
 GLuint programObject;
 SDLStage* stage;
+
+Huis * mijnHuis = nullptr;
 
 
 void handleEvent (SDL_Event &event) {
@@ -124,6 +128,11 @@ int initOpenGL () {
 	
 }
 
+void initWorld()
+{
+	mijnHuis = new Huis();
+}
+
 
 
 glm::mat4 camera(float Translate, glm::vec2 const& Rotate, float fov = 0.25f, float aspect = 4.0f / 3.0f, float near = 0.1f, float far = 100.0f)
@@ -165,12 +174,13 @@ void render (SDL_Surface *screen)
 	
 //	if(!didAlready)
 	{
-		glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
+		glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, mijnHuis->vertices());
 	
 		glEnableVertexAttribArray (0);
 	}
 	
-	glDrawArrays (GL_TRIANGLES, 0, 3);
+	//glDrawArrays (GL_TRIANGLES, 0, 3);
+	glDrawElements(	GL_TRIANGLES, mijnHuis->indexCount(), GL_UNSIGNED_SHORT, mijnHuis->indices());
 	
 	SDL_GL_SwapBuffers ();
 
@@ -234,10 +244,12 @@ int main (int argc, char** argv)
 		
 	}
 	
-	stage -> setCaption ("SimpleGL");
+	stage -> setCaption ("Hollandia");
 	stage -> setEventListener (&handleEvent);
 	stage -> setRenderCallback (&render);
 	stage -> setUpdateCallback (&update);
+
+	initWorld();
 	
 	#ifdef EMSCRIPTEN
 	

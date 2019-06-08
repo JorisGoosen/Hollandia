@@ -1,7 +1,7 @@
 all: Shaders SimpleGL
 	
 SimpleGL:
-	emcc -o SimpleGL.js SimpleGL.cpp SDLStage.cpp -s FULL_ES2=1
+	emcc -o SimpleGL.js SimpleGL.cpp SDLStage.cpp Huis.cpp -s FULL_ES2=1
 
 sedPattern = 's/^\(.*\)$$/"\1\\n"/g'
 Shaders:
