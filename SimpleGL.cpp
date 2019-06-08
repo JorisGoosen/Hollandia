@@ -99,6 +99,7 @@ int initOpenGL () {
 	glAttachShader (programObject, vertexShader);
 	glAttachShader (programObject, fragmentShader);
 	glBindAttribLocation (programObject, 0, "vPosition");
+	glBindAttribLocation (programObject, 1, "vExtra");
 	glLinkProgram (programObject);
 	
 	glGetProgramiv (programObject, GL_LINK_STATUS, &linked);
@@ -124,6 +125,8 @@ int initOpenGL () {
 	}
 	
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+
+	glEnable(GL_DEPTH_TEST);
 	return 1;
 	
 }
@@ -145,13 +148,6 @@ glm::mat4 camera(float Translate, glm::vec2 const& Rotate, float fov = 0.25f, fl
 	return Projection * View * Model;
 }
 
-bool didAlready = false;
-
-GLfloat vVertices[] = { 
-		0.0f, 0.75f, 0.0f,
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f
-	};
 
 float xRot = 0.0f;
 float yRot = 0.0f;
@@ -161,23 +157,19 @@ void render (SDL_Surface *screen)
 	glViewport (0, 0, screen -> w, screen -> h);
 	
 	glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
-	glClear (GL_COLOR_BUFFER_BIT);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_TEST);
 	
 	
-
-
 	glm::mat4 m = camera(1.0f, glm::vec2(xRot, yRot));
 
 	glUseProgram (programObject);
 	glUniformMatrix4fv(glGetUniformLocation(programObject, "ProjViewModel"), 1, GL_FALSE, glm::value_ptr(m));
-	
-	
-//	if(!didAlready)
-	{
-		glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, mijnHuis->vertices());
-	
-		glEnableVertexAttribArray (0);
-	}
+
+	glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 5 * 4, mijnHuis->vertices());
+	glVertexAttribPointer (1, 2, GL_FLOAT, GL_FALSE, 5 * 4, mijnHuis->vertices() + (3 * 4));
+
+	glEnableVertexAttribArray (0);
+	glEnableVertexAttribArray (1);
 	
 	//glDrawArrays (GL_TRIANGLES, 0, 3);
 	glDrawElements(	GL_TRIANGLES, mijnHuis->indexCount(), GL_UNSIGNED_SHORT, mijnHuis->indices());

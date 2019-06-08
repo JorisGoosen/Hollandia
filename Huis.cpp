@@ -34,9 +34,16 @@ void Huis::generateHouse(glm::vec3 center, glm::vec3 dim)
 
 void Huis::pushVertex(glm::vec3 v)
 {
+	static float x0 = 0.0f, x1 = 2.0f;
+	
 	_vertices.push_back(v.x);
 	_vertices.push_back(v.y);
 	_vertices.push_back(v.z);
+	_vertices.push_back(x0);
+	_vertices.push_back(x1);
+
+	x0 += 0.8f;
+	x1 += 0.6666f;
 }
 
 void Huis::pushTriangle(uint16_t v0, uint16_t v1, uint16_t v2)
