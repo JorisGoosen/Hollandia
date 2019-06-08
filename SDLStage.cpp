@@ -35,8 +35,9 @@ SDLStage::SDLStage (int width, int height, int frameRate, int flags)
 
 void SDLStage::resize(int w, int h)
 {
-	//screen = SDL_SetVideoMode (w, h, 0, _flags);
+	screen = SDL_SetVideoMode (w, h, 0, _flags);
 	//screen.
+	//screen->
 }
 
 SDLStage::~SDLStage () {

@@ -1,8 +1,11 @@
-attribute vec4 vPosition;    
-varying vec4 vPos;    
+
+uniform mat4 ProjViewModel;
+
+attribute vec4 vPosition;     
 
 void main()                  
-{                            
-   gl_Position = vPosition;  
-   vPos = vPosition; 
+{  
+	mat4 hallo = mat4(1.0);
+	gl_Position = ProjViewModel * vPosition;  
+    
 }                            

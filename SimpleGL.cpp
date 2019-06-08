@@ -11,6 +11,15 @@
 #include "Huis.vert.h"
 #include "Huis.frag.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/vec3.hpp" // glm::vec3
+#include "glm/vec4.hpp" // glm::vec4
+#include "glm/mat4x4.hpp" // glm::mat4
+#include "glm/ext/matrix_transform.hpp" // glm::translate, glm::rotate, glm::scale
+#include "glm/ext/matrix_clip_space.hpp" // glm::perspective
+#include "glm/ext/scalar_constants.hpp" // glm::pi
+
 GLuint programObject;
 SDLStage* stage;
 
@@ -116,24 +125,51 @@ int initOpenGL () {
 }
 
 
-void render (SDL_Surface *screen) {
-	
-	GLfloat vVertices[] = { 
+
+glm::mat4 camera(float Translate, glm::vec2 const& Rotate, float fov = 0.25f, float aspect = 4.0f / 3.0f, float near = 0.1f, float far = 100.0f)
+{
+	glm::mat4 	Projection 	= glm::perspective(glm::pi<float>() * fov, aspect, near, far);
+	glm::mat4 	View 		= glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
+				View 		= glm::rotate(View, Rotate.y, glm::vec3(-1.0f, 0.0f, 0.0f));
+				View 		= glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 	Model 		= glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+	return Projection * View * Model;
+}
+
+bool didAlready = false;
+
+GLfloat vVertices[] = { 
 		0.0f, 0.75f, 0.0f,
 		-0.5f, -0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f
 	};
-	
+
+float xRot = 0.0f;
+float yRot = 0.0f;
+
+void render (SDL_Surface *screen) 
+{
 	glViewport (0, 0, screen -> w, screen -> h);
 	
 	glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 	glClear (GL_COLOR_BUFFER_BIT);
 	
+	
+
+
+	glm::mat4 m = camera(1.0f, glm::vec2(xRot, yRot));
+
 	glUseProgram (programObject);
+	glUniformMatrix4fv(glGetUniformLocation(programObject, "ProjViewModel"), 1, GL_FALSE, glm::value_ptr(m));
 	
-	glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
 	
-	glEnableVertexAttribArray (0);
+//	if(!didAlready)
+	{
+		glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
+	
+		glEnableVertexAttribArray (0);
+	}
+	
 	glDrawArrays (GL_TRIANGLES, 0, 3);
 	
 	SDL_GL_SwapBuffers ();
@@ -141,16 +177,23 @@ void render (SDL_Surface *screen) {
 }
 
 
-void update (int deltaTime) {
-	
-	
+void update (int deltaTime) 
+{
+	float sec = float(deltaTime) / 1000.0f;
+
+	xRot += 0.10f * sec;
+	yRot += 0.33f * sec;
 	
 }
 
 
-void step () {
+void step () 
+{
 	
 	stage -> step ();
+
+
+
 	
 }
 
